@@ -247,3 +247,26 @@
     justify-content: center;
   }
 }
+
+@media (max-width: 640px) {
+  .hero-left h1 {
+    font-size: 36px;
+  }
+  .hero-desc {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+  .hero-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .featured-card {
+    height: 320px;
+  }
+  .float-card {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    padding: 12px;
+  }
+}

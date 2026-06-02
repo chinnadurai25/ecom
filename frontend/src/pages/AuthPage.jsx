@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa';
 import './AuthPage.css';
 
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 
 import logo from "../assets/logo.png";
 
@@ -17,7 +17,8 @@ const AuthPage = () => {
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const navigate = useNavigate();
 
-    const [isLogin, setIsLogin] = useState(true);
+    const location = useLocation();
+    const [isLogin, setIsLogin] = useState(location.state?.isLogin !== undefined ? location.state.isLogin : true);
     const [showPassword, setShowPassword] = useState(false);
 
     // Animation Variants

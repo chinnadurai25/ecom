@@ -253,7 +253,7 @@ const Profile = () => {
                   value={addressText}
                   onChange={e => setAddressText(e.target.value)}
                 />
-                <button onClick={handleAddAddress}>Save Address</button>
+                <button className="update-pwd-btn" onClick={handleAddAddress}>Save Address</button>
               </div>
             )}
           </section>
@@ -268,7 +268,7 @@ const Profile = () => {
               <input type="password" placeholder="Current Password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} />
               <input type="password" placeholder="New Password" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
               <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
-              <button onClick={handleChangePassword}>Update Password</button>
+              <button className="update-pwd-btn" onClick={handleChangePassword}>Update Password</button>
             </div>
           </section>
 

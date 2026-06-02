@@ -423,3 +423,49 @@
     }
   }
 }
+
+@media (max-width: 640px) {
+  .main-nav {
+    padding: 15px 20px;
+    gap: 15px;
+  }
+
+  .logo-brand {
+    font-size: 18px;
+    padding: 5px 12px;
+  }
+
+  .brand-logo-img {
+    height: 24px;
+  }
+
+  .search-bar {
+    margin: 10px 0 0 0;
+  }
+
+  .categories-flex {
+    padding: 0 10px;
+  }
+
+  .all-categories {
+    padding-right: 15px;
+    margin-right: 10px;
+    font-size: 13px;
+  }
+
+  .cat-links {
+    gap: 10px;
+  }
+
+  .cat-item {
+    font-size: 12px;
+    padding: 4px 10px 4px 4px;
+    height: 34px;
+  }
+
+  .cat-icon-wrapper {
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+  }
+}
