@@ -280,22 +280,7 @@ const Checkout = () => {
                   <div className="method-details"><span className="method-title">PayPal</span></div>
                 </label>
 
-                {/* 5. Cash on Delivery */}
-                <label className={`method-option ${selectedPayment === 'cod' ? 'active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    onChange={() => setSelectedPayment('cod')}
-                    checked={selectedPayment === 'cod'}
-                  />
-                  <span className="custom-radio"></span>
-                  <div className="method-details">
-                    <span className="method-title">Cash on Delivery (COD)</span>
-                    <p className="method-desc" style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0 0' }}>
-                      Pay when you receive the package.
-                    </p>
-                  </div>
-                </label>
+
               </div>
             </section>
           </div>
@@ -348,7 +333,7 @@ const Checkout = () => {
 
               <button className="place-order-btn" onClick={handlePlaceOrder}>
                 <Lock size={16} />
-                {selectedPayment === 'cod' ? 'Confirm Order' : 'Place Order'}
+                Place Order
               </button>
             </div>
           </aside>
