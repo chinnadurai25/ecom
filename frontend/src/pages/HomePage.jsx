@@ -1,6 +1,5 @@
 import API_BASE_URL from '../api';
 import Header from "../components/Header";
-import FlashSaleBar from "../components/FlashSaleBar";
 import Hero from "../components/Hero";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
@@ -67,7 +66,6 @@ const HomePage = () => {
     <div className="homepage">
       <Header cartCount={3} onSearch={setSearchTerm} />
       <Hero />
-      <FlashSaleBar />
 
       <div className="home-container container">
         {/* Sidebar Filters */}
@@ -149,11 +147,7 @@ const HomePage = () => {
             <button className="clear-btn" onClick={() => setSelectedCategories([])}>Clear All Filters</button>
           </div>
 
-          {/* Special Offer Banner */}
-          <div className="sidebar-banner">
-            <h3>Special Offer!</h3>
-            <p>Exclusive offers are live! Grab your favorites now before they are gone.</p>
-          </div>
+
         </aside>
 
         {/* Main Content */}

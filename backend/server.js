@@ -1,4 +1,7 @@
 // server.js
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -7,6 +10,7 @@ const multer = require("multer");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
 
 const app = express();
 const fs = require("fs");
@@ -292,7 +296,7 @@ app.get("/cart/:email", async (req, res) => {
 app.post("/cart", async (req, res) => {
   try {
     const { userEmail, productId, name, price, img, qty } = req.body;
-    
+
     let item = await Cart.findOne({ userEmail, productId });
     if (item) {
       item.qty += qty;
@@ -318,9 +322,9 @@ app.post("/cart/update-qty", async (req, res) => {
 
 app.delete("/cart/:email/:productId", async (req, res) => {
   try {
-    await Cart.findOneAndDelete({ 
-      userEmail: req.params.email, 
-      productId: req.params.productId 
+    await Cart.findOneAndDelete({
+      userEmail: req.params.email,
+      productId: req.params.productId
     });
     res.json({ message: "Item removed from cart" });
   } catch (err) {
@@ -473,7 +477,7 @@ app.get("/reviews/:productId", async (req, res) => {
 app.post("/reviews", upload.array("images", 5), async (req, res) => {
   try {
     const { productId, userEmail, userName, rating, comment } = req.body;
-    
+
     // Save images if any
     const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
 

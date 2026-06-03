@@ -41,35 +41,6 @@ const Footer = () => {
                 </div>
             </div>
 
-            {/* 2. Trust Bar */}
-            <div className="footer-trust-bar">
-                <div className="trust-item">
-                    <FaTruck className="trust-icon" />
-                    <div className="trust-text">
-                        <h6>Free Shipping</h6>
-                    </div>
-                </div>
-                <div className="trust-item">
-                    <FaSyncAlt className="trust-icon" />
-                    <div className="trust-text">
-                        <h6>Easy Returns</h6>
-                    </div>
-                </div>
-                <div className="trust-item">
-                    <FaShieldAlt className="trust-icon" />
-                    <div className="trust-text">
-                        <h6>Secure Payment</h6>
-                        <p>100% protected payments</p>
-                    </div>
-                </div>
-                <div className="trust-item">
-                    <FaAward className="trust-icon" />
-                    <div className="trust-text">
-                        <h6>Quality Assured</h6>
-                        <p>Premium cotton fabrics</p>
-                    </div>
-                </div>
-            </div>
 
             {/* Background Branding Watermark */}
             <div className="footer-watermark">VEDAN</div>
