@@ -17,6 +17,10 @@ const OrdersPage = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     useEffect(() => {
+        if (!user) {
+            setLoading(false);
+            return;
+        }
         if (user?.email) {
             fetch(`${API_BASE_URL}/orders/${user.email}`)
                 .then((res) => res.json())
@@ -90,6 +94,20 @@ const OrdersPage = () => {
     };
 
     if (loading) return <div className="loading">Loading orders...</div>;
+
+    if (!user) {
+        return (
+            <div className="orders-page-wrapper">
+                <div className="orders-container" style={{ textAlign: "center", marginTop: "120px", minHeight: "50vh" }}>
+                    <h2>Please login to view your orders</h2>
+                    <button className="back-home-btn" style={{ marginTop: "20px", display: "inline-block" }} onClick={() => navigate("/auth")}>
+                        Go to Login
+                    </button>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
 
     const stages = ["Ordered", "Shipped", "Delivered"];
 

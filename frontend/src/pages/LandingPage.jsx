@@ -47,8 +47,8 @@ const LandingPage = () => {
                     <span>VEDAN</span>
                 </motion.div>
                 <div className="nav-actions">
-                    <button className="nav-btn login-btn" onClick={() => navigate('/auth', { state: { isLogin: true } })}>Login</button>
-                    <button className="nav-btn signup-btn" onClick={() => navigate('/auth', { state: { isLogin: false } })}>Get Started</button>
+                    <button className="nav-btn login-btn" onClick={() => navigate('/auth', { state: { isLogin: true, adminOnly: true } })}>Login</button>
+                    <button className="nav-btn signup-btn" onClick={() => navigate('/home')}>Get Started</button>
                 </div>
             </nav>
 
@@ -76,15 +76,9 @@ const LandingPage = () => {
                     <motion.div variants={itemVariants} className="hero-cta-group">
                         <button 
                             className="cta-primary" 
-                            onClick={() => navigate('/auth', { state: { isLogin: false } })}
+                            onClick={() => navigate('/home')}
                         >
                             Create Account <FaRocket className="icon-right" />
-                        </button>
-                        <button 
-                            className="cta-secondary"
-                            onClick={() => navigate('/auth', { state: { isLogin: true } })}
-                        >
-                            Existing Member? Login
                         </button>
                     </motion.div>
 

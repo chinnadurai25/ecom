@@ -37,7 +37,7 @@ const Checkout = () => {
   const handlePlaceOrder = async () => {
     if (!user) {
       alert("Please login to place an order");
-      navigate("/login");
+      navigate("/auth", { state: { fromCheckout: true } });
       return;
     }
 

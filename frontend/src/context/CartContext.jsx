@@ -108,8 +108,21 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const clearCart = async () => {
+    setCart([]);
+    if (userEmail) {
+      try {
+        await fetch(`${API_BASE_URL}/cart/${userEmail}`, {
+          method: "DELETE"
+        });
+      } catch (err) {
+        console.error("Failed to clear cart:", err);
+      }
+    }
+  };
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQty }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQty, clearCart }}>
       {children}
     </CartContext.Provider>
   );

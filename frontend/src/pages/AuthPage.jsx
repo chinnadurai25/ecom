@@ -18,6 +18,7 @@ const AuthPage = () => {
     const navigate = useNavigate();
 
     const location = useLocation();
+    const adminOnly = location.state?.adminOnly === true;
     const [isLogin, setIsLogin] = useState(location.state?.isLogin !== undefined ? location.state.isLogin : true);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -104,13 +105,20 @@ const AuthPage = () => {
                 return;
             }
 
+            // Admin-only mode: block regular customers
+            if (adminOnly && !data.user.isAdmin) {
+                setError("This login is for admin only. Customers, please browse freely.");
+                return;
+            }
+
             localStorage.setItem("token", data.token);
             localStorage.setItem("user", JSON.stringify(data.user));
 
             if (data.user.isAdmin) {
                 navigate("/admin");
             } else {
-                navigate("/home");
+                const destination = location.state?.fromCheckout ? "/checkout" : "/home";
+                navigate(destination);
             }
         } catch (err) {
             setError("Something went wrong. Please try again.");
@@ -213,12 +221,14 @@ const AuthPage = () => {
                             >
                                 Login
                             </button>
-                            <button
-                                className={`auth-tab ${!isLogin ? 'active' : ''}`}
-                                onClick={() => setIsLogin(false)}
-                            >
-                                Sign Up
-                            </button>
+                            {!adminOnly && (
+                                <button
+                                    className={`auth-tab ${!isLogin ? 'active' : ''}`}
+                                    onClick={() => setIsLogin(false)}
+                                >
+                                    Sign Up
+                                </button>
+                            )}
                         </div>
 
                         <AnimatePresence mode='wait'>

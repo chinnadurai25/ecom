@@ -51,8 +51,6 @@ const Header = ({ onSearch }) => {
           </div>
           <div className="top-links">
             <Link to="/customer-service">Customer Service</Link>
-            <Link to="/track">Track Order</Link>
-            <Link to="/app">Download App</Link>
           </div>
         </div>
       </div>
@@ -113,11 +111,18 @@ const Header = ({ onSearch }) => {
               <span className="mobile-label">Cart</span>
             </Link>
 
-            {/* 🚪 Logout */}
-            <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="icon-link" style={{ background: "none", border: "none", cursor: "pointer" }}>
-              <FaSignOutAlt />
-              <span className="mobile-label">Logout</span>
-            </button>
+            {/* 🚪 Login / Logout */}
+            {localStorage.getItem("user") ? (
+              <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="icon-link" style={{ background: "none", border: "none", cursor: "pointer" }}>
+                <FaSignOutAlt />
+                <span className="mobile-label">Logout</span>
+              </button>
+            ) : (
+              <Link to="/auth" className="icon-link" onClick={() => setIsMobileMenuOpen(false)}>
+                <FaSignOutAlt style={{ transform: "rotate(180deg)" }} />
+                <span className="mobile-label">Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>

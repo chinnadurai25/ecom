@@ -332,6 +332,16 @@ app.delete("/cart/:email/:productId", async (req, res) => {
   }
 });
 
+// CLEAR ENTIRE CART
+app.delete("/cart/:email", async (req, res) => {
+  try {
+    await Cart.deleteMany({ userEmail: req.params.email });
+    res.json({ message: "Cart cleared successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to clear cart" });
+  }
+});
+
 /* ================= ADMIN ================= */
 
 // CATEGORY
