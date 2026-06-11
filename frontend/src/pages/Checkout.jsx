@@ -11,8 +11,8 @@ const Checkout = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   // State for selection logic
-  const [selectedShipping, setSelectedShipping] = useState('standard');
-  const [selectedPayment, setSelectedPayment] = useState('card');
+  const selectedShipping = 'standard';
+  const [selectedPayment, setSelectedPayment] = useState('gpay');
 
   // State for shipping information
   const [shippingInfo, setShippingInfo] = useState({
@@ -144,101 +144,15 @@ const Checkout = () => {
               </div>
             </section>
 
-            {/* Step 2: Shipping Method */}
+            {/* Step 2: Payment Method */}
             <section className="checkout-card">
               <div className="step-header">
                 <span className="step-num">2</span>
-                <h3>Shipping Method</h3>
-              </div>
-              <div className="method-selection-container">
-                <label className={`method-option ${selectedShipping === 'standard' ? 'active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="shipping"
-                    onChange={() => setSelectedShipping('standard')}
-                    checked={selectedShipping === 'standard'}
-                  />
-                  <span className="custom-radio"></span>
-                  <div className="method-details">
-                    <span className="method-title">Standard Shipping <span className="method-time">5-7 business days</span></span>
-                  </div>
-                  <span className="method-price free">FREE</span>
-                </label>
-
-                <label className={`method-option ${selectedShipping === 'express' ? 'active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="shipping"
-                    onChange={() => setSelectedShipping('express')}
-                    checked={selectedShipping === 'express'}
-                  />
-                  <span className="custom-radio"></span>
-                  <div className="method-details">
-                    <span className="method-title">Express Shipping <span className="method-time">2-3 business days</span></span>
-                  </div>
-                  <span className="method-price">₹9.99</span>
-                </label>
-
-                <label className={`method-option ${selectedShipping === 'overnight' ? 'active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="shipping"
-                    onChange={() => setSelectedShipping('overnight')}
-                    checked={selectedShipping === 'overnight'}
-                  />
-                  <span className="custom-radio"></span>
-                  <div className="method-details">
-                    <span className="method-title">Overnight Shipping <span className="method-time">Next business day</span></span>
-                  </div>
-                  <span className="method-price">₹24.99</span>
-                </label>
-              </div>
-            </section>
-
-            {/* Step 3: Payment Method */}
-            <section className="checkout-card">
-              <div className="step-header">
-                <span className="step-num">3</span>
                 <h3>Payment Method</h3>
               </div>
               <div className="payment-selection-container">
 
-                {/* 1. Credit Card */}
-                <label className={`method-option ${selectedPayment === 'card' ? 'active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    onChange={() => setSelectedPayment('card')}
-                    checked={selectedPayment === 'card'}
-                  />
-                  <span className="custom-radio"></span>
-                  <div className="method-details"><span className="method-title">Credit / Debit Card</span></div>
-                  <div className="card-icons">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" />
-                  </div>
-                </label>
-
-                {selectedPayment === 'card' && (
-                  <div className="payment-form">
-                    <div className="field full">
-                      <label>Card Number</label>
-                      <input type="text" placeholder="1234 5678 9012 3456" />
-                    </div>
-                    <div className="input-grid">
-                      <div className="field">
-                        <label>Expiry Date</label>
-                        <input type="text" placeholder="MM/YY" />
-                      </div>
-                      <div className="field">
-                        <label>CVV</label>
-                        <input type="text" placeholder="123" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. Google Pay */}
+                {/* Google Pay */}
                 <label className={`method-option ${selectedPayment === 'gpay' ? 'active' : ''}`}>
                   <input
                     type="radio"
@@ -253,33 +167,20 @@ const Checkout = () => {
                   </div>
                 </label>
 
-                {/* 3. Apple Pay */}
-                <label className={`method-option ${selectedPayment === 'apple' ? 'active' : ''}`}>
+                {/* PhonePe */}
+                <label className={`method-option ${selectedPayment === 'phonepe' ? 'active' : ''}`}>
                   <input
                     type="radio"
                     name="payment"
-                    onChange={() => setSelectedPayment('apple')}
-                    checked={selectedPayment === 'apple'}
+                    onChange={() => setSelectedPayment('phonepe')}
+                    checked={selectedPayment === 'phonepe'}
                   />
                   <span className="custom-radio"></span>
-                  <div className="method-details"><span className="method-title">Apple Pay</span></div>
+                  <div className="method-details"><span className="method-title">PhonePe</span></div>
                   <div className="card-icons">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay" style={{ height: '18px' }} />
+                    <img src="https://cdn.simpleicons.org/phonepe" alt="PhonePe" style={{ height: '18px' }} />
                   </div>
                 </label>
-
-                {/* 4. PayPal */}
-                <label className={`method-option ${selectedPayment === 'paypal' ? 'active' : ''}`}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    onChange={() => setSelectedPayment('paypal')}
-                    checked={selectedPayment === 'paypal'}
-                  />
-                  <span className="custom-radio"></span>
-                  <div className="method-details"><span className="method-title">PayPal</span></div>
-                </label>
-
 
               </div>
             </section>
