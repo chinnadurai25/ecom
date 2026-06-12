@@ -10,6 +10,13 @@ const multer = require("multer");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder",
+  key_secret: process.env.RAZORPAY_KEY_SECRET || "placeholder_secret",
+});
 
 
 const app = express();
@@ -73,6 +80,13 @@ const orderSchema = new mongoose.Schema({
   userEmail: String,
   userName: String,
   status: { type: String, default: "Ordered" },
+  shippingAddress: {
+    firstName: String,
+    lastName: String,
+    email: String,
+    phone: String,
+    address: String,
+  },
   createdAt: { type: Date, default: Date.now },
 });
 
@@ -469,6 +483,92 @@ app.post("/orders", async (req, res) => {
 
 app.get("/orders/:email", async (req, res) => {
   res.json(await Order.find({ userEmail: req.params.email }));
+});
+
+// Update order status (Demo/Client controls)
+app.put("/orders/:id/status", async (req, res) => {
+  try {
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: req.body.status },
+      { new: true }
+    );
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    res.json({ message: "Status updated successfully", order });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update order status" });
+  }
+});
+
+/* ================= RAZORPAY PAYMENT ================= */
+
+// 1. Create a Razorpay Order
+app.post("/razorpay/order", async (req, res) => {
+  try {
+    const { amount } = req.body;
+    if (!amount) {
+      return res.status(400).json({ message: "Amount is required" });
+    }
+
+    const options = {
+      amount: Math.round(amount * 100), // convert to paise
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`,
+    };
+
+    const order = await razorpay.orders.create(options);
+    res.json({
+      id: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder",
+    });
+  } catch (error) {
+    console.error("Razorpay Order Creation Failed:", error);
+    res.status(500).json({ message: "Failed to create Razorpay order" });
+  }
+});
+
+// 2. Verify Razorpay Payment Signature & Save Orders
+app.post("/razorpay/verify", async (req, res) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      orderDetails
+    } = req.body;
+
+    const key_secret = process.env.RAZORPAY_KEY_SECRET || "placeholder_secret";
+    const shasum = crypto.createHmac("sha256", key_secret);
+    shasum.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+    const digest = shasum.digest("hex");
+
+    if (digest !== razorpay_signature) {
+      return res.status(400).json({ message: "Transaction signature verification failed" });
+    }
+
+    // Create database orders for each item in the cart
+    const savedOrders = [];
+    for (const item of orderDetails.items) {
+      const order = await Order.create({
+        productName: item.name,
+        productId: item.productId || item._id || item.id,
+        quantity: item.qty,
+        price: item.price * item.qty,
+        userEmail: orderDetails.userEmail,
+        userName: orderDetails.userName,
+        shippingAddress: orderDetails.shippingAddress,
+        status: "Ordered",
+      });
+      savedOrders.push(order);
+    }
+
+    res.json({ message: "Payment verified and orders saved successfully", orders: savedOrders });
+  } catch (error) {
+    console.error("Razorpay Verification Error:", error);
+    res.status(500).json({ message: "Internal Server Error during verification" });
+  }
 });
 
 /* ================= REVIEWS ================= */

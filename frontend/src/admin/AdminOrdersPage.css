@@ -196,22 +196,27 @@
 
 .status-select.ordered {
   background: #e0e7ff;
+  color: #3730a3;
 }
 
 .status-select.packed {
   background: #cffafe;
+  color: #155e75;
 }
 
 .status-select.shipped {
   background: #fffbeb;
+  color: #92400e;
 }
 
 .status-select.delivered {
   background: #dcfce7;
+  color: #166534;
 }
 
 .status-select.cancelled {
   background: #fee2e2;
+  color: #991b1b;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -319,6 +324,12 @@
   }
 
   .orders-table td:nth-of-type(7)::before {
+    content: "Details";
+    font-weight: 600;
+    color: #6b7280;
+  }
+
+  .orders-table td:nth-of-type(8)::before {
     content: "Status";
     font-weight: 600;
     color: #6b7280;

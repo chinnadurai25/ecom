@@ -12,13 +12,14 @@ const Checkout = () => {
 
   // State for selection logic
   const selectedShipping = 'standard';
-  const [selectedPayment, setSelectedPayment] = useState('gpay');
+  const [selectedPayment, setSelectedPayment] = useState('razorpay');
 
   // State for shipping information
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
     lastName: '',
     email: user?.email || '',
+    phone: '',
     address: ''
   });
 
@@ -34,6 +35,16 @@ const Checkout = () => {
   const tax = subtotal * 0.08;
   const total = subtotal + tax + shippingCost;
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handlePlaceOrder = async () => {
     if (!user) {
       alert("Please login to place an order");
@@ -41,37 +52,98 @@ const Checkout = () => {
       return;
     }
 
-    if (!shippingInfo.firstName || !shippingInfo.address) {
-      alert("Please fill in the required shipping information");
+    if (!shippingInfo.firstName || !shippingInfo.address || !shippingInfo.phone) {
+      alert("Please fill in the required shipping information (including Phone Number)");
       return;
     }
 
-    try {
-      const orderPromises = cart.map(item =>
-        fetch(`${API_BASE_URL}/orders`, {
+    if (selectedPayment === 'razorpay' || selectedPayment === 'gpay' || selectedPayment === 'phonepe') {
+      const isScriptLoaded = await loadRazorpayScript();
+      if (!isScriptLoaded) {
+        alert("Failed to load Razorpay SDK. Please check your internet connection.");
+        return;
+      }
+
+      try {
+        // 1. Create order on backend
+        const orderResponse = await fetch(`${API_BASE_URL}/razorpay/order`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            productName: item.name,
-            productId: item._id || item.id,
-            quantity: item.qty,
-            price: item.price * item.qty,
-            userEmail: user.email,
-            userName: user.name,
-            shippingAddress: shippingInfo,
-            shippingMethod: selectedShipping,
-            paymentMethod: selectedPayment,
-            shippingCost: shippingCost
-          })
-        })
-      );
+          body: JSON.stringify({ amount: total }),
+        });
 
-      await Promise.all(orderPromises);
-      if (clearCart) clearCart();
-      navigate('/order-success', { state: { purchasedItems: cart } });
-    } catch (error) {
-      console.error("Order failed:", error);
-      alert("Failed to place order. Please try again.");
+        if (!orderResponse.ok) {
+          throw new Error("Failed to initiate Razorpay order");
+        }
+
+        const razorpayOrder = await orderResponse.json();
+
+        // Prefill method if UPI (gpay / phonepe) is chosen
+        const prefillMethod = (selectedPayment === 'gpay' || selectedPayment === 'phonepe') ? 'upi' : undefined;
+
+        // 2. Open Razorpay Checkout
+        const options = {
+          key: razorpayOrder.key_id,
+          amount: razorpayOrder.amount,
+          currency: razorpayOrder.currency,
+          name: "VEDAN Store",
+          description: "Order Checkout Payment",
+          image: "https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg",
+          order_id: razorpayOrder.id,
+          handler: async function (response) {
+            try {
+              // 3. Verify signature and create orders in database
+              const verifyResponse = await fetch(`${API_BASE_URL}/razorpay/verify`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  orderDetails: {
+                    userEmail: user.email,
+                    userName: user.name,
+                    items: cart.map(item => ({
+                      name: item.name,
+                      productId: item.productId || item._id || item.id,
+                      qty: item.qty,
+                      price: item.price,
+                    })),
+                    shippingAddress: shippingInfo,
+                  }
+                }),
+              });
+
+              if (!verifyResponse.ok) {
+                const errData = await verifyResponse.json();
+                throw new Error(errData.message || "Payment verification failed");
+              }
+
+              if (clearCart) await clearCart();
+              navigate('/order-success', { state: { purchasedItems: cart } });
+            } catch (err) {
+              console.error("Payment verification error:", err);
+              alert(`Payment verification failed: ${err.message}`);
+            }
+          },
+          prefill: {
+            name: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+            email: shippingInfo.email,
+            contact: shippingInfo.phone,
+            method: prefillMethod
+          },
+          theme: {
+            color: "#1e293b",
+          },
+        };
+
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.open();
+
+      } catch (error) {
+        console.error("Razorpay placement failed:", error);
+        alert("Failed to initiate Razorpay transaction. Please try again.");
+      }
     }
   };
 
@@ -131,6 +203,17 @@ const Checkout = () => {
                   />
                 </div>
                 <div className="field full">
+                  <label>Phone Number</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="9876543210"
+                    value={shippingInfo.phone}
+                    onChange={handleShippingChange}
+                    required
+                  />
+                </div>
+                <div className="field full">
                   <label>Street Address</label>
                   <input
                     type="text"
@@ -151,6 +234,23 @@ const Checkout = () => {
                 <h3>Payment Method</h3>
               </div>
               <div className="payment-selection-container">
+
+                {/* Razorpay */}
+                <label className={`method-option ${selectedPayment === 'razorpay' ? 'active' : ''}`}>
+                  <input
+                    type="radio"
+                    name="payment"
+                    onChange={() => setSelectedPayment('razorpay')}
+                    checked={selectedPayment === 'razorpay'}
+                  />
+                  <span className="custom-radio"></span>
+                  <div className="method-details">
+                    <span className="method-title">Razorpay (Cards, Netbanking, UPI)</span>
+                  </div>
+                  <div className="card-icons">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg" alt="Razorpay" style={{ height: '14px' }} />
+                  </div>
+                </label>
 
                 {/* Google Pay */}
                 <label className={`method-option ${selectedPayment === 'gpay' ? 'active' : ''}`}>

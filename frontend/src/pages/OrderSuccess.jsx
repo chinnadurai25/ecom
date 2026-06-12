@@ -18,6 +18,7 @@ const OrderSuccess = () => {
   const [hover, setHover] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasRated, setHasRated] = useState(false);
+  const [skippedRating, setSkippedRating] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -79,14 +80,14 @@ const OrderSuccess = () => {
           </div>
         )}
 
-        {/* MANDATORY RATING SECTION */}
+        {/* RATING SECTION (OPTIONAL) */}
         {!hasRated && itemToRate ? (
           <div className="mandatory-rating-section" style={{ marginTop: '20px', padding: '20px', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
             <h3 style={{ fontSize: '1.2rem', color: '#1f2937', marginBottom: '10px', textAlign: 'center' }}>
               How was your experience?
             </h3>
             <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: '20px', fontSize: '0.9rem' }}>
-              Please rate <strong>{itemToRate.name}</strong> to continue shopping.
+              Please rate <strong>{itemToRate.name}</strong> or skip to continue shopping.
             </p>
 
             {/* Stars */}
@@ -113,24 +114,46 @@ const OrderSuccess = () => {
               style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db', minHeight: '80px', marginBottom: '15px' }}
             />
 
-            {/* Submit Button */}
-            <button
-              onClick={handleSubmitReview}
-              disabled={isSubmitting}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: '#6366f1',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: 'bold',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                opacity: isSubmitting ? 0.7 : 1
-              }}
-            >
-              {isSubmitting ? "Submitting..." : "Submit & Continue"}
-            </button>
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={handleSubmitReview}
+                disabled={isSubmitting}
+                style={{
+                  flex: 2,
+                  padding: '12px',
+                  background: '#6366f1',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  opacity: isSubmitting ? 0.7 : 1
+                }}
+              >
+                {isSubmitting ? "Submitting..." : "Submit & Continue"}
+              </button>
+
+              <button
+                onClick={() => {
+                  setSkippedRating(true);
+                  setHasRated(true);
+                }}
+                disabled={isSubmitting}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  background: '#f3f4f6',
+                  color: '#4b5563',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Skip
+              </button>
+            </div>
           </div>
         ) : (
           /* Normal Success View (Shown ONLY after rating or if no item to rate) */
@@ -140,8 +163,12 @@ const OrderSuccess = () => {
                 <div className="check-container">
                   <CheckCircle size={80} className="main-check-icon" style={{ color: '#10b981' }} />
                 </div>
-                <h2 style={{ color: '#10b981', marginBottom: '10px' }}>All set!</h2>
-                <p style={{ color: '#6b7280', marginBottom: '30px' }}>Thanks for your rating.</p>
+                <h2 style={{ color: '#10b981', marginBottom: '10px' }}>
+                  {skippedRating ? "Thank you!" : "All set!"}
+                </h2>
+                <p style={{ color: '#6b7280', marginBottom: '30px' }}>
+                  {skippedRating ? "Your order is on the way." : "Thanks for your rating."}
+                </p>
               </div>
             )}
 
