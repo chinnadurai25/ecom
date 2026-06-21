@@ -113,6 +113,8 @@ const AuthPage = () => {
 
             localStorage.setItem("token", data.token);
             localStorage.setItem("user", JSON.stringify(data.user));
+            // Notify CartContext on the same tab to re-fetch cart
+            window.dispatchEvent(new Event("storage"));
 
             if (data.user.isAdmin) {
                 navigate("/admin");

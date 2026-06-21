@@ -11,7 +11,6 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess"; // ✅ Import Success Page
 import AuthPage from "./pages/AuthPage";         // ✅ Import Login/Signup Page
-import LandingPage from "./pages/LandingPage";   // ✅ Import Landing Page
 import AdminDashboard from "./admin/AdminDashboard"; // ✅ Import Admin Dashboard
 import AddCategory from "./admin/AddCategory";
 import AddProduct from "./admin/AddProduct";
@@ -28,8 +27,8 @@ function App() {
       <CartProvider>
         <Router>
           <Routes>
-            {/* Landing & Auth Routes */}
-            <Route path="/" element={<LandingPage />} />
+            {/* Routes */}
+            <Route path="/" element={<HomePage />} />
             <Route path="/auth" element={<AuthPage />} />
 
             {/* Shop Routes */}

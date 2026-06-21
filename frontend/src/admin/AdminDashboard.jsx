@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { FaStore } from "react-icons/fa";
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
@@ -25,7 +25,12 @@ const AdminDashboard = () => {
       <div className="admin-card">
         <div className="admin-header">
           <h2 className="admin-title">Admin Dashboard</h2>
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
+          <div className="admin-header-btns">
+            <button className="view-store-btn" onClick={() => navigate("/home")}>
+              <FaStore /> View Store
+            </button>
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
+          </div>
         </div>
 
         <div className="admin-actions">

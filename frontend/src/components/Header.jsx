@@ -1,5 +1,5 @@
 import API_BASE_URL from '../api';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FaSearch,
@@ -7,10 +7,11 @@ import {
   FaHeart,
   FaShoppingCart,
   FaBars,
-  FaMapMarkerAlt,
   FaSignOutAlt,
+  FaSignInAlt,
   FaBoxOpen,
-  FaTimes // Added close icon
+  FaTimes,
+  FaChevronDown
 } from "react-icons/fa";
 import "./Header.css";
 import { useWishlist } from "../context/WishlistContext";
@@ -21,21 +22,42 @@ import logo from "../assets/logo.png";
 const Header = ({ onSearch }) => {
   const [showCategories, setShowCategories] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  const user = (() => {
+    try { return JSON.parse(localStorage.getItem("user")); } catch { return null; }
+  })();
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    window.dispatchEvent(new Event("storage")); // Notify CartContext
+    setUserDropdownOpen(false);
     navigate("/");
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const [categories, setCategories] = useState([]);
 
   const { wishlist } = useWishlist();
-  const { cart } = useCart(); // ✅ cart count
+  const { cart } = useCart();
   useEffect(() => {
     fetch(`${API_BASE_URL}/categories`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Fetched Categories:", data); // Debugging line
+        console.log("Fetched Categories:", data);
         setCategories(data);
       })
       .catch((err) => console.error("Error fetching categories:", err));
@@ -81,15 +103,6 @@ const Header = ({ onSearch }) => {
         <div className={`nav-content ${isMobileMenuOpen ? "open" : ""}`}>
 
           <div className="nav-icons">
-            <Link to="/profile" className="icon-link" onClick={() => setIsMobileMenuOpen(false)}>
-              <FaUser />
-              <span className="mobile-label">Profile</span>
-            </Link>
-
-            <Link to="/orders" className="icon-link" title="My Orders" onClick={() => setIsMobileMenuOpen(false)}>
-              <FaBoxOpen />
-              <span className="mobile-label">Orders</span>
-            </Link>
 
             {/* ❤️ Wishlist */}
             <Link to="/wishlist" className="icon-link" onClick={() => setIsMobileMenuOpen(false)}>
@@ -111,16 +124,64 @@ const Header = ({ onSearch }) => {
               <span className="mobile-label">Cart</span>
             </Link>
 
-            {/* 🚪 Login / Logout */}
-            {localStorage.getItem("user") ? (
-              <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="icon-link" style={{ background: "none", border: "none", cursor: "pointer" }}>
-                <FaSignOutAlt />
-                <span className="mobile-label">Logout</span>
-              </button>
+            {/* 👤 User Avatar / Login */}
+            {user ? (
+              <div className="user-avatar-wrap" ref={dropdownRef}>
+                <button
+                  className="user-avatar-btn"
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  aria-label="User menu"
+                >
+                  <div className="avatar-circle">
+                    {user.name ? user.name.charAt(0).toUpperCase() : <FaUser />}
+                  </div>
+                  <FaChevronDown className={`avatar-chevron ${userDropdownOpen ? "open" : ""}`} />
+                </button>
+
+                {userDropdownOpen && (
+                  <div className="user-dropdown">
+                    <div className="dropdown-header">
+                      <div className="dropdown-avatar">
+                        {user.name ? user.name.charAt(0).toUpperCase() : <FaUser />}
+                      </div>
+                      <div>
+                        <p className="dropdown-name">{user.name || "User"}</p>
+                        <p className="dropdown-email">{user.email || ""}</p>
+                      </div>
+                    </div>
+                    <div className="dropdown-divider" />
+                    <Link
+                      to="/profile"
+                      className="dropdown-item"
+                      onClick={() => { setUserDropdownOpen(false); setIsMobileMenuOpen(false); }}
+                    >
+                      <FaUser /> My Profile
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="dropdown-item"
+                      onClick={() => { setUserDropdownOpen(false); setIsMobileMenuOpen(false); }}
+                    >
+                      <FaBoxOpen /> My Orders
+                    </Link>
+                    <div className="dropdown-divider" />
+                    <button
+                      className="dropdown-item dropdown-logout"
+                      onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                    >
+                      <FaSignOutAlt /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
-              <Link to="/auth" className="icon-link" onClick={() => setIsMobileMenuOpen(false)}>
-                <FaSignOutAlt style={{ transform: "rotate(180deg)" }} />
-                <span className="mobile-label">Login</span>
+              <Link
+                to="/auth"
+                className="nav-login-btn"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <FaSignInAlt />
+                <span>Login</span>
               </Link>
             )}
           </div>

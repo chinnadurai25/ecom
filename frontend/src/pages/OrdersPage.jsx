@@ -93,11 +93,6 @@ const OrdersPage = () => {
         }
     };
 
-    const handleCancelOrder = (orderId) => {
-        if (window.confirm("Are you sure you want to cancel this order?")) {
-            updateOrderStatus(orderId, "Cancelled");
-        }
-    };
 
     if (loading) return <div className="loading">Loading orders...</div>;
 
@@ -187,12 +182,7 @@ const OrdersPage = () => {
                                             <FaStar /> Rate & Review
                                         </button>
 
-                                        {order.status === "Ordered" && (
-                                            <button className="cancel-order-btn" onClick={() => handleCancelOrder(order._id)}>
-                                                Cancel Order
-                                            </button>
-                                        )}
- 
+
                                         <div className="demo-controls">
                                             {order.status === "Ordered" && (
                                                 <button className="demo-btn ship" onClick={() => updateOrderStatus(order._id, "Shipped")}>
