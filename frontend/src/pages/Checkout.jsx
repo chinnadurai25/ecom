@@ -1,5 +1,5 @@
 import API_BASE_URL from '../api';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from "../context/CartContext";
 import { ChevronLeft, Lock } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
@@ -28,11 +28,26 @@ const Checkout = () => {
     setShippingInfo(prev => ({ ...prev, [name]: value }));
   };
 
+  const [shippingCost, setShippingCost] = useState(0);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/settings`);
+        if (res.ok) {
+          const data = await res.json();
+          setShippingCost(data.shippingAmount || 0);
+        }
+      } catch (err) {
+        console.error("Failed to fetch settings", err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   // Calculations
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const shippingCosts = { standard: 0, express: 9.99, overnight: 24.99 };
-  const shippingCost = shippingCosts[selectedShipping];
-  const tax = subtotal * 0.08;
+  const tax = cart.reduce((acc, item) => acc + (item.price * item.qty) * ((item.taxPercentage || 0) / 100), 0);
   const total = subtotal + tax + shippingCost;
 
   const loadRazorpayScript = () => {
@@ -322,7 +337,7 @@ const Checkout = () => {
                   </span>
                 </div>
                 <div className="total-row">
-                  <span>Tax (8%)</span>
+                  <span>Tax</span>
                   <span>₹{tax.toFixed(2)}</span>
                 </div>
                 <hr />

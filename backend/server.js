@@ -66,6 +66,7 @@ const productSchema = new mongoose.Schema({
   price: Number,
   description: String,
   image: String,
+  taxPercentage: { type: Number, default: 0 },
   averageRating: { type: Number, default: 0 },
   ratingCount: { type: Number, default: 0 },
 });
@@ -101,6 +102,7 @@ const cartSchema = new mongoose.Schema({
   unitPrice: Number,
   price: Number,
   img: String,
+  taxPercentage: { type: Number, default: 0 },
   qty: { type: Number, default: 1 },
 });
 const Cart = mongoose.model("Cart", cartSchema);
@@ -126,6 +128,12 @@ const reviewSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 const Review = mongoose.model("Review", reviewSchema);
+
+// SETTINGS
+const settingsSchema = new mongoose.Schema({
+  shippingAmount: { type: Number, default: 0 },
+});
+const Settings = mongoose.model("Settings", settingsSchema);
 
 // CUSTOMER SUPPORT
 // CUSTOMER SUPPORT CHAT
@@ -309,14 +317,15 @@ app.get("/cart/:email", async (req, res) => {
 
 app.post("/cart", async (req, res) => {
   try {
-    const { userEmail, productId, name, price, img, qty } = req.body;
+    const { userEmail, productId, name, price, img, taxPercentage, qty } = req.body;
 
     let item = await Cart.findOne({ userEmail, productId });
     if (item) {
       item.qty += qty;
+      item.taxPercentage = taxPercentage !== undefined ? taxPercentage : item.taxPercentage;
       await item.save();
     } else {
-      item = await Cart.create({ userEmail, productId, name, price, img, qty });
+      item = await Cart.create({ userEmail, productId, name, price, img, taxPercentage, qty });
     }
     res.json(item);
   } catch (err) {
@@ -442,7 +451,36 @@ app.put("/admin/orders/:id", verifyAdmin, async (req, res) => {
   res.json({ message: "Status updated" });
 });
 
+// SETTINGS (ADMIN)
+app.put("/admin/settings", verifyAdmin, async (req, res) => {
+  try {
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = new Settings(req.body);
+    } else {
+      settings.shippingAmount = req.body.shippingAmount !== undefined ? req.body.shippingAmount : settings.shippingAmount;
+    }
+    await settings.save();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update settings" });
+  }
+});
+
 /* ================= USER ================= */
+
+// SETTINGS (PUBLIC)
+app.get("/settings", async (req, res) => {
+  try {
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = await Settings.create({ shippingAmount: 0 });
+    }
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch settings" });
+  }
+});
 
 // PRODUCTS
 app.get("/products", async (req, res) => res.json(await Product.find()));

@@ -11,6 +11,7 @@ const EditProduct = () => {
     name: "",
     category: "",
     price: "",
+    taxPercentage: "",
     description: "",
   });
   const [image, setImage] = useState(null);
@@ -33,6 +34,7 @@ const EditProduct = () => {
           name: data.name,
           category: data.category,
           price: data.price,
+          taxPercentage: data.taxPercentage || 0,
           description: data.description || "",
         });
         setCurrentImage(data.image);
@@ -50,6 +52,7 @@ const EditProduct = () => {
     formData.append("name", form.name);
     formData.append("category", form.category);
     formData.append("price", form.price);
+    formData.append("taxPercentage", form.taxPercentage);
     formData.append("description", form.description);
     formData.append("email", adminEmail);
     if (image) {
@@ -108,6 +111,14 @@ const EditProduct = () => {
           placeholder="Price"
           value={form.price}
           onChange={(e) => setForm({ ...form, price: e.target.value })}
+        />
+
+        <label>Tax Percentage (%)</label>
+        <input
+          type="number"
+          placeholder="Tax Percentage"
+          value={form.taxPercentage}
+          onChange={(e) => setForm({ ...form, taxPercentage: e.target.value })}
         />
 
         <label>Current Image</label>

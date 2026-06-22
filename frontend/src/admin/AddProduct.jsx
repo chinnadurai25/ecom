@@ -9,6 +9,7 @@ const AddProduct = () => {
     name: "",
     category: "",
     price: "",
+    taxPercentage: "",
     description: "",
   });
   const [image, setImage] = useState(null);
@@ -28,6 +29,7 @@ const AddProduct = () => {
     formData.append("name", form.name);
     formData.append("category", form.category);
     formData.append("price", form.price);
+    formData.append("taxPercentage", form.taxPercentage);
     formData.append("description", form.description);
     formData.append("email", adminEmail);
     formData.append("image", image); // 🔥 IMPORTANT
@@ -74,6 +76,12 @@ const AddProduct = () => {
           type="number"
           placeholder="Price (₹)"
           onChange={(e) => setForm({ ...form, price: e.target.value })}
+        />
+
+        <input
+          type="number"
+          placeholder="Tax Percentage (%)"
+          onChange={(e) => setForm({ ...form, taxPercentage: e.target.value })}
         />
 
         {/* Image Upload */}

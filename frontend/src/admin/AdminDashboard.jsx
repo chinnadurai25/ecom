@@ -49,6 +49,9 @@ const AdminDashboard = () => {
           <button onClick={() => navigate("/admin/support")} style={{ background: "#8b5cf6" }}>
             Customer Support
           </button>
+          <button onClick={() => navigate("/admin/settings")} style={{ background: "#10b981" }}>
+            Store Settings
+          </button>
         </div>
 
 

@@ -82,6 +82,7 @@ export const CartProvider = ({ children }) => {
             name: product.name,
             price: product.price,
             img: product.image || product.img,
+            taxPercentage: product.taxPercentage || 0,
             qty: 1
           })
         });
