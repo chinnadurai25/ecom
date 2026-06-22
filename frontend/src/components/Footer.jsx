@@ -73,7 +73,6 @@ const Footer = () => {
                             <li><Link to="/category/Round Neck">Round Neck T-shirts</Link></li>
                             <li><Link to="/category/Oversized">Oversized T-shirts</Link></li>
                             <li><Link to="/category/Polo">Polo T-shirts</Link></li>
-                            <li><Link to="/home">New Arrivals</Link></li>
                             <li><Link to="/home">Best Sellers</Link></li>
                         </ul>
                     </div>

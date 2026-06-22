@@ -29,7 +29,7 @@ function Hero() {
     <section className="hero-section-wrapper">
       <div className="container hero-container" key={slide.id}>
         <div className="hero-left fade-in">
-          <span className="badge-new">New Arrivals 2026</span>
+
 
           <h1>
             Discover Your <br />
@@ -44,7 +44,7 @@ function Hero() {
             <button className="primary-btn">
               Shop Now <FaArrowRight />
             </button>
-            <button className="secondary-btn">View Deals</button>
+
           </div>
         </div>
 
